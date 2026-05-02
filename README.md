@@ -37,4 +37,5 @@ to whom I am thankful: <https://kelar.org/~bandali/>.
 ## Sources
 
 - Git repository: <https://github.com/protesilaos/buffer-to-pdf>.
+- Video demonstration: <https://protesilaos.com/codelog/2026-05-02-emacs-buffer-to-pdf-new-package/>.
 - Backronym: Bewitched Users Find Files Effortlessly Rendered To PDF.
