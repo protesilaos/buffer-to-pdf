@@ -214,6 +214,7 @@ If only BEG is provided, move point to BEG and set window start."
    (lambda ()
      (buffer-to-pdf--create-page orientation (point) (org-entry-end-position)))))
 
+;; FIXME 2026-05-02: The page delimiter should not appear in the PDF.
 (defun buffer-to-pdf--export-for-page-delimiter (orientation)
   "Export buffer, one page per `page-delimiter', given ORIENTATION."
   (save-excursion
