@@ -156,38 +156,26 @@ Merge ORIENTATION parameters with `buffer-to-pdf-common-frame-parameters'."
     (when (fboundp mode)
       (funcall mode value))))
 
-(defmacro buffer-to-pdf--with-page (orientation &rest body)
-  "Create a frame and buffer for ORIENTATION and evaluate BODY.
-Track frame and buffer in `buffer-to-pdf--frames' and
-`buffer-to-pdf--indirect-buffers', respectively.
-
-Return the created frame after evaluating BODY."
-  (declare (indent 1))
-  (let ((frame (make-symbol "frame"))
-        (buffer (make-symbol "buffer")))
-    `(let ((,frame (buffer-to-pdf--make-frame ,orientation))
-           (,buffer (clone-indirect-buffer nil nil)))
-       (push ,frame buffer-to-pdf--frames)
-       (push ,buffer buffer-to-pdf--indirect-buffers)
-       (with-selected-frame ,frame
-         (switch-to-buffer ,buffer :no-record)
-         (buffer-to-pdf--setup-buffer-state)
-         ,@body)
-       ,frame)))
-
 (defun buffer-to-pdf--create-page (orientation &optional beg end)
   "Create a frame and indirect buffer for a PDF page.
 Use ORIENTATION for the frame dimensions.
 If BEG and END are provided, narrow the buffer to that region.
 If only BEG is provided, move point to BEG and set window start."
-  (buffer-to-pdf--with-page orientation
-    (cond
-     ((and beg end)
-      (narrow-to-region beg end)
-      (goto-char beg))
-     (beg
-      (goto-char beg)
-      (set-window-start nil beg)))))
+  (let ((frame (buffer-to-pdf--make-frame orientation))
+        (buffer (clone-indirect-buffer nil nil)))
+    (push frame buffer-to-pdf--frames)
+    (push buffer buffer-to-pdf--indirect-buffers)
+    (with-selected-frame frame
+      (switch-to-buffer buffer :no-record)
+      (buffer-to-pdf--setup-buffer-state)
+      (cond
+       ((and beg end)
+        (narrow-to-region beg end)
+        (goto-char beg))
+       (beg
+        (goto-char beg)
+        (set-window-start nil beg))))
+    frame))
 
 (defun buffer-to-pdf--has-outline-p ()
   "Return non-nil if buffer has `outline-regexp' and concomitant heading."
