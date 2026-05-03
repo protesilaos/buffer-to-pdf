@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/buffer-to-pdf
 ;; Version: 0.0.0
-;; Package-Requires: ((emacs "28.1"))
+;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: convenience
 
 ;; This file is NOT part of GNU Emacs.
