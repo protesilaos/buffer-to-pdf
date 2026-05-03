@@ -156,10 +156,10 @@ Merge ORIENTATION parameters with `buffer-to-pdf-common-frame-parameters'."
     (when (fboundp mode)
       (funcall mode value))))
 
-(defun buffer-to-pdf--create-page (orientation &optional beg end)
+(defun buffer-to-pdf--create-page (orientation beg end)
   "Create a frame and indirect buffer for a PDF page.
 Use ORIENTATION for the frame dimensions.
-If BEG and END are provided, narrow the buffer to that region.
+BEG and END are buffer positions to narrow to.
 If only BEG is provided, move point to BEG and set window start."
   (let ((frame (buffer-to-pdf--make-frame orientation))
         (buffer (clone-indirect-buffer nil nil)))
@@ -174,7 +174,9 @@ If only BEG is provided, move point to BEG and set window start."
         (goto-char beg))
        (beg
         (goto-char beg)
-        (set-window-start nil beg))))
+        (set-window-start nil beg))
+       (t
+        (error "Missing beginning position"))))
     frame))
 
 (defun buffer-to-pdf--has-outline-p ()
@@ -235,9 +237,9 @@ If only BEG is provided, move point to BEG and set window start."
   "Export buffer, one page per window boundaries, given ORIENTATION."
   (let ((start (point-min)))
     (if (eobp)
-        (buffer-to-pdf--create-page orientation)
+        (buffer-to-pdf--create-page orientation nil nil)
       (while (< start (point-max))
-        (let* ((frame (buffer-to-pdf--create-page orientation start))
+        (let* ((frame (buffer-to-pdf--create-page orientation start nil))
                (end (with-selected-frame frame
                       (redisplay t)
                       (window-end nil t))))
