@@ -204,7 +204,6 @@ If only BEG is provided, move point to BEG and set window start."
    (lambda ()
      (buffer-to-pdf--create-page orientation (point) (org-entry-end-position)))))
 
-;; FIXME 2026-05-02: The page delimiter should not appear in the PDF.
 (defun buffer-to-pdf--export-for-page-delimiter (orientation)
   "Export buffer, one page per `page-delimiter', given ORIENTATION."
   (save-excursion
@@ -254,10 +253,10 @@ If only BEG is provided, move point to BEG and set window start."
   (cond
    ((derived-mode-p 'org-mode)
     (buffer-to-pdf--export-for-org orientation))
-   ((buffer-to-pdf--has-outline-p)
-    (buffer-to-pdf--export-for-outline orientation))
    ((buffer-to-pdf--has-pages-p)
     (buffer-to-pdf--export-for-page-delimiter orientation))
+   ((buffer-to-pdf--has-outline-p)
+    (buffer-to-pdf--export-for-outline orientation))
    (t
     (buffer-to-pdf--export-for-window-boundaries orientation)))
   (reverse buffer-to-pdf--frames))
@@ -325,12 +324,12 @@ Supported export methods are as follows, in order of precedence:
 - Org documents have one page per heading.  The text before the first
   heading is its own page.
 
-- Documents with an `outline-regexp' and concomitant outline headings
-  behave the same as Org.
-
 - Buffers with the `page-delimiter' get one page per delimiter.  The
   text before the first delimiter and after the last delimiter is put in
   its own page.
+
+- Documents with an `outline-regexp' and concomitant outline headings
+  behave the same as Org.
 
 - As a fallback, the buffer is split into pages based on the window
   boundaries, which depend on the ORIENTATION and the font size."
