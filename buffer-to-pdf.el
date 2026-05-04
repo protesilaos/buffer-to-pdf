@@ -330,6 +330,8 @@ applied to the `default' face to create a monochromatic effect, per
       (save-restriction
         (unwind-protect
             (when-let* ((frames (buffer-to-pdf--export orientation)))
+              ;; TODO 2026-05-04: Find if non-Cairo builds of Emacs
+              ;; have support for the equivalent of `x-export-frames'.
               (let ((pdf-data (x-export-frames frames 'pdf))
                     (coding-system-for-write 'binary))
                 (write-region pdf-data nil pdf-path)
@@ -376,6 +378,7 @@ Supported export methods are as follows, in order of precedence:
 Also see the commands `buffer-to-pdf-black-on-white' and
 `buffer-to-pdf-white-on-black' for monochromatic exporting."
   (interactive (list (current-buffer) (buffer-to-pdf-orientation-prompt)))
+  ;; NOTE 2026-05-04: See TODO related to `buffer-to-pdf--make-document'.
   (unless (string-match-p "cairo" system-configuration-features)
     (user-error "Build Emacs with support for Cairo"))
   (let* ((name (buffer-to-pdf--get-name buffer))
