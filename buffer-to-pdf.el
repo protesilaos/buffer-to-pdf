@@ -385,14 +385,14 @@ Also see the commands `buffer-to-pdf-black-on-white' and
          (pdf-path (buffer-to-pdf--get-document-path name)))
     (buffer-to-pdf--make-document pdf-path buffer orientation)))
 
-;;;####autoload
+;;;###autoload
 (defun buffer-to-pdf-black-on-white ()
   "Like `buffer-to-pdf' but with black text on a white background."
   (interactive)
   (let ((buffer-to-pdf-monochrome (cons "white" "black")))
     (call-interactively #'buffer-to-pdf)))
 
-;;;####autoload
+;;;###autoload
 (defun buffer-to-pdf-white-on-black ()
   "Like `buffer-to-pdf' but with white text on a black background."
   (interactive)
