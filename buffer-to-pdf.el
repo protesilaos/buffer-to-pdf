@@ -280,6 +280,10 @@ applied to the `default' face to create a monochromatic effect, per
               (narrow-to-region start end))
             (setq start end)))))))
 
+;; TODO 2026-05-04: Add support for "mixed" pagination, like headings,
+;; page-delimiter, window boundaries.  This way we can get a decent
+;; PDF even if the user has not taken care to split everything
+;; visually.
 (defun buffer-to-pdf--export (orientation)
   "Produce pages for the current buffer based on its state and ORIENTATION."
   (cond
