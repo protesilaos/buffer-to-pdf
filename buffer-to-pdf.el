@@ -285,6 +285,9 @@ applied to the `default' face to create a monochromatic effect, per
   (cond
    ((derived-mode-p 'org-mode)
     (buffer-to-pdf--export-for-org orientation))
+   ;; FIXME 2026-05-04: In Elisp buffers, the `page-delimiter' and the
+   ;; `outline-regexp' overall.  I do not like this.  I want to have a
+   ;; clear separation, but need to think how best to approach this.
    ((buffer-to-pdf--has-pages-p)
     (buffer-to-pdf--export-for-page-delimiter orientation))
    ((buffer-to-pdf--has-outline-p)
