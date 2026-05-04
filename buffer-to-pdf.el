@@ -156,16 +156,48 @@ Merge ORIENTATION parameters with `buffer-to-pdf-common-frame-parameters'."
     (when (fboundp mode)
       (funcall mode value))))
 
+(defun buffer-to-pdf--get-faces ()
+  "Return all the faces except `default'."
+  (if-let* ((faces (face-list)))
+      (delq 'default faces)
+    (error "No faces found")))
+
+(defun buffer-to-pdf--set-faces-to-monochrome (frame default-background default-foreground)
+  "Reset on face colors in FRAME.
+Make the `default' face use DEFAULT-BACKGROUND and DEFAULT-FOREGROUND."
+  (dolist (face (buffer-to-pdf--get-faces))
+    ;; TODO 2026-05-04: Maybe check if it has `:underline' and such.
+    ;; If so, set its value accordingly.
+    (set-face-attribute face frame :background 'unspecified :foreground 'unspecified))
+  (set-face-attribute 'default frame :background default-background :foreground default-foreground))
+
+(defvar buffer-to-pdf-monochrome nil
+  "A cons cell of (BACKGROUND . FOREGROUND) colors.
+When bound, make `buffer-to-pdf--create-page' use those color values to
+affect the PDF, instead of relying on the current theme.
+
+Also see the commands `buffer-to-pdf-black-on-white' and
+`buffer-to-pdf-white-on-black', which `let' bind this variable.")
+
 (defun buffer-to-pdf--create-page (orientation beg end)
   "Create a frame and indirect buffer for a PDF page.
-Use ORIENTATION for the frame dimensions.
-BEG and END are buffer positions to narrow to.
-If only BEG is provided, move point to BEG and set window start."
+Use ORIENTATION for the frame dimensions.  BEG and END are buffer
+positions to narrow to.  If only BEG is provided, move point to BEG and
+set window start there.
+
+When `buffer-to-pdf-monochrome' is bound, it should be a cons cell of
+the form (BACKGROUND . FOREGROUND).  Those are color values which are
+applied to the `default' face to create a monochromatic effect, per
+`buffer-to-pdf--set-faces-to-monochrome'."
   (let ((frame (buffer-to-pdf--make-frame orientation))
         (buffer (clone-indirect-buffer nil nil)))
     (push frame buffer-to-pdf--frames)
     (push buffer buffer-to-pdf--indirect-buffers)
     (with-selected-frame frame
+      (when-let* ((monochrome buffer-to-pdf-monochrome)
+                  (background (car monochrome))
+                  (foreground (cdr monochrome)))
+        (buffer-to-pdf--set-faces-to-monochrome frame background foreground))
       (switch-to-buffer buffer :no-record)
       (buffer-to-pdf--setup-buffer-state)
       (cond
@@ -332,13 +364,30 @@ Supported export methods are as follows, in order of precedence:
   behave the same as Org.
 
 - As a fallback, the buffer is split into pages based on the window
-  boundaries, which depend on the ORIENTATION and the font size."
+  boundaries, which depend on the ORIENTATION and the font size.
+
+Also see the commands `buffer-to-pdf-black-on-white' and
+`buffer-to-pdf-white-on-black' for monochromatic exporting."
   (interactive (list (current-buffer) (buffer-to-pdf-orientation-prompt)))
   (unless (string-match-p "cairo" system-configuration-features)
     (user-error "Build Emacs with support for Cairo"))
   (let* ((name (buffer-to-pdf--get-name buffer))
          (pdf-path (buffer-to-pdf--get-document-path name)))
     (buffer-to-pdf--make-document pdf-path buffer orientation)))
+
+;;;####autoload
+(defun buffer-to-pdf-black-on-white ()
+  "Like `buffer-to-pdf' but with black text on a white background."
+  (interactive)
+  (let ((buffer-to-pdf-monochrome (cons "white" "black")))
+    (call-interactively #'buffer-to-pdf)))
+
+;;;####autoload
+(defun buffer-to-pdf-white-on-black ()
+  "Like `buffer-to-pdf' but with white text on a black background."
+  (interactive)
+  (let ((buffer-to-pdf-monochrome (cons "black" "white")))
+    (call-interactively #'buffer-to-pdf)))
 
 (provide 'buffer-to-pdf)
 ;;; buffer-to-pdf.el ends here
