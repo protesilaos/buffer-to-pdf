@@ -33,7 +33,9 @@
 ;; To produce a document, go to a buffer and invoke the command
 ;; `buffer-to-pdf'.  It will prompt you for an orientation among
 ;; `buffer-to-pdf-orientations'.  Then it will generate the document
-;; relative to the `buffer-to-pdf-directory'.
+;; relative to the `buffer-to-pdf-directory'.  Use the command
+;; `buffer-to-pdf-resize' to adjust your existing frame to the desired
+;; orientation, so you can test what the output will look like.
 ;;
 ;; Advanced users can modify the `buffer-to-pdf-local-variables',
 ;; `buffer-to-pdf-common-frame-parameters'.  I am not exposing them as
@@ -400,6 +402,17 @@ Also see the commands `buffer-to-pdf-black-on-white' and
   (interactive)
   (let ((buffer-to-pdf-monochrome (cons "black" "white")))
     (call-interactively #'buffer-to-pdf)))
+
+;;;###autoload
+(defun buffer-to-pdf-resize (orientation)
+  "Resize the current frame to ORIENTATION.
+[This is useful to test your buffer's contents before converting them to
+a PDF.]"
+  (interactive (list (buffer-to-pdf-orientation-prompt)))
+  (let ((frame-resize-pixelwise t))
+    (modify-frame-parameters
+     nil
+     (buffer-to-pdf--get-orientation-parameters orientation))))
 
 (provide 'buffer-to-pdf)
 ;;; buffer-to-pdf.el ends here

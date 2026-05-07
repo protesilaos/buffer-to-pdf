@@ -7,7 +7,9 @@ per the function `x-export-frames`.
 To produce a document, go to a buffer and invoke the command
 `buffer-to-pdf`. It will prompt you for an orientation among
 `buffer-to-pdf-orientations`. Then it will generate the document
-relative to the `buffer-to-pdf-directory`.
+relative to the `buffer-to-pdf-directory`. Use the command
+`buffer-to-pdf-resize` to adjust your existing frame to the desired
+orientation, so you can test what the output will look like.
 
 Advanced users can modify the `buffer-to-pdf-local-variables`,
 `buffer-to-pdf-common-frame-parameters`. I am not exposing them as
