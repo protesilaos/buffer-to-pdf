@@ -104,12 +104,14 @@ called with (e.g. 1 and -1).")
     (height . (text-pixels . ,(window-pixel-height)))))
 
 (defvar buffer-to-pdf-orientations
-  '((landscape . ((width . (text-pixels . 960))
-                  (height . (text-pixels . 720))))
-    (portrait . ((width . (text-pixels . 720))
-                 (height . (text-pixels . 960))))
-    (high-definition . ((width . (text-pixels . 1920))
-                        (height . (text-pixels . 1080))))
+  '((landscape . ((width . (text-pixels . 1024))
+                  (height . (text-pixels . 768))))
+    (portrait . ((width . (text-pixels . 768))
+                 (height . (text-pixels . 1024))))
+    (high-definition-portrait . ((width . (text-pixels . 1080))
+                                 (height . (text-pixels . 1920))))
+    (high-definition-landscape . ((width . (text-pixels . 1920))
+                                  (height . (text-pixels . 1080))))
     (current-window . buffer-to-pdf--get-window-orientation))
   "Frame layouts to affect the dimensions of the resulting PDF.
 Each element is a cons cell of the form (SYMBOL . PARAMETERS) where
