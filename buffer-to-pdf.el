@@ -337,18 +337,25 @@ applied to the `default' face to create a monochromatic effect, per
 
 (defun buffer-to-pdf--make-document (pdf-path buffer orientation)
   "Make PDF-PATH file for BUFFER using frame ORIENTATION."
-  (with-current-buffer buffer
-    (save-excursion
-      (save-restriction
-        (unwind-protect
-            (when-let* ((frames (buffer-to-pdf--export orientation)))
-              ;; TODO 2026-05-04: Find if non-Cairo builds of Emacs
-              ;; have support for the equivalent of `x-export-frames'.
-              (let ((pdf-data (x-export-frames frames 'pdf))
-                    (coding-system-for-write 'binary))
-                (write-region pdf-data nil pdf-path)
-                (message "Exported %d pages to %s" (length frames) pdf-path)))
-          (buffer-to-pdf--clear-state))))))
+  (let ((path (propertize pdf-path 'face 'warning)))
+    (message "PREPARING to write to %s..." path)
+    (with-current-buffer buffer
+      (save-excursion
+        (save-restriction
+          (unwind-protect
+              (when-let* ((frames (buffer-to-pdf--export orientation))
+                          (length (length frames)))
+                ;; TODO 2026-05-04: Find if non-Cairo builds of Emacs
+                ;; have support for the equivalent of `x-export-frames'.
+                (let ((pdf-data (x-export-frames frames 'pdf))
+                      (coding-system-for-write 'binary))
+                  (write-region pdf-data nil path)
+                  (message
+                   "PREPARING to write to %s... %s writing %s pages"
+                   path
+                   (propertize "DONE" 'face 'success)
+                   length)))
+            (buffer-to-pdf--clear-state)))))))
 
 (defvar buffer-to-pdf-orientation-prompt-history nil
   "Minibuffer history for `buffer-to-pdf-orientation-prompt'.")
