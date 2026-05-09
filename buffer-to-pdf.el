@@ -63,9 +63,7 @@
   :package-version '(buffer-to-pdf . "0.1.0"))
 
 (defvar buffer-to-pdf-common-frame-parameters
-  '((no-focus-on-map . t)
-    (no-accept-focus . t)
-    (undecorated . t)
+  '((undecorated . t)
     (internal-border-width . 60)
     (left-fringe . 0)
     (right-fringe . 0)
@@ -76,7 +74,15 @@
   "Common frame parameters to affect the resulting PDF.")
 
 (defconst buffer-to-pdf-irriducible-frame-parameters
-  '((visibility . t))
+  '((visibility . t)
+    (skip-taskbar . t)
+    (no-focus-on-map . t)
+    (no-accept-focus . t)
+    (override-redirect . t)
+    ;; HACK 2026-05-09: I still need to test this on as many window
+    ;; managers as I can.
+    (left . -10000)
+    (top . -10000))
   "Like `buffer-to-pdf-common-frame-parameters' but essential.")
 
 (defvar buffer-to-pdf-local-variables
