@@ -57,9 +57,13 @@
   "Create a PDF out of your current buffer, exactly as you see it."
   :group 'convenience)
 
-(defcustom buffer-to-pdf-directory (expand-file-name "~/")
-  "The directory where PDF files are saved at."
-  :type 'directory
+(defcustom buffer-to-pdf-directory #'buffer-to-pdf-get-default-directory-or-home
+  "The directory where PDF files are saved at.
+This is either a filesystem path or a function that takes no arguments
+and returns a filesystem path.  For a reference implementation, see
+`buffer-to-pdf-get-default-directory-or-home'."
+  :type '(choice (directory :tag "Where to save all PDFs")
+                 (function :tag "Function with no parameters that returns a path"))
   :package-version '(buffer-to-pdf . "0.1.0"))
 
 (defvar buffer-to-pdf-common-frame-parameters
@@ -318,11 +322,23 @@ applied to the `default' face to create a monochromatic effect, per
            (file-name-sans-extension (file-name-nondirectory (buffer-file-name buffer))))
       (buffer-name buffer)))
 
+(defun buffer-to-pdf-get-default-directory-or-home ()
+  "Return the `default-directory' if appropriate.
+Return the `default-directory' if it is writable, else return the home
+directory."
+  (expand-file-name
+   (if (file-writable-p default-directory)
+       default-directory
+     "~/")))
+
 (defun buffer-to-pdf--get-directory ()
   "Return the `buffer-to-pdf-directory'."
-  (if (file-exists-p buffer-to-pdf-directory)
-      (file-name-directory buffer-to-pdf-directory)
-    (user-error "The `buffer-to-pdf-directory' must exist")))
+  (let ((file (if (functionp buffer-to-pdf-directory)
+                  (funcall buffer-to-pdf-directory)
+                buffer-to-pdf-directory)))
+    (if (file-exists-p file)
+        (file-name-directory file)
+      (user-error "The `buffer-to-pdf-directory' as `%s' does not exist" file))))
 
 (defun buffer-to-pdf--get-document-path (name)
   "Return a PDF document path with the given NAME."
